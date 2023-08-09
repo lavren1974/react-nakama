@@ -1,0 +1,4 @@
+/backend/config/config.yml
+/backend/logs/logfile.log
+node_modules
+/backend/.cookie
