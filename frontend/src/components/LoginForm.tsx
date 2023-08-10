@@ -1,5 +1,5 @@
 // src/LoginForm.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Client, Session } from '@heroiclabs/nakama-js';
 import LoginFormRes from './LoginFormRes';
 // import {
@@ -11,16 +11,28 @@ import LoginFormRes from './LoginFormRes';
 //   ThemeProvider,
 // } from "@material-tailwind/react";
 import "tailwindcss/tailwind.css";
+import {
+  saveSessionToStorage,
+  getSessionFromStorage,
+  removeSessionFromStorage
+} from '../utils/nakamaHelpers';
 
 const LoginForm: React.FC = () => {
-  const [formTrue, setFormTrue] = useState<boolean>(true);
+  const [sessionLocal, setSessionLocal] = useState<Session | null>(null);
+  // const [formTrue, setFormTrue] = useState<boolean>(true);
   const [login, setLogin] = useState<string | undefined>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [user_id, setUserId] = useState<string | undefined>('');
-  const [token, setToken] = useState<string | undefined>('');
+  // const [user_id, setUserId] = useState<string | undefined>('');
+  // const [token, setToken] = useState<string | undefined>('');
 
-
+  useEffect(() => {
+    // On component mount, try to get the session from local storage
+    const storedSession = getSessionFromStorage();
+    if (storedSession) {
+      setSessionLocal(JSON.parse(storedSession));
+    }
+  }, []);
 
   const handleLogin = async () => {
 
@@ -33,42 +45,46 @@ const LoginForm: React.FC = () => {
     try {
       let create = true
       const session: Session = await client.authenticateEmail(email, password, create, login);
+      setSessionLocal(session);
+      saveSessionToStorage(JSON.stringify(session));
       console.log('Logged in successfully:', session);
 
       setLogin(session.username);
-      setUserId(session.user_id);
-      setToken(session.token);
+      // setUserId(session.user_id);
+      // setToken(session.token);
       // Navigate to another component or save session as required. 
-      setFormTrue(false);
+      // setFormTrue(false);
     } catch (error) {
       console.error('Login failed:', error);
     }
   };
 
+  const handleLogout = () => {
+    setSessionLocal(null);
+    removeSessionFromStorage();
+  };
+
   return (
-    // <div>
-    //   <input 
-    //     type="name" 
-    //     placeholder="Name" 
-    //     value={name} 
-    //     onChange={(e) => setName(e.target.value)} 
-    //   />
-    //   <input 
-    //     type="email" 
-    //     placeholder="Email" 
-    //     value={email} 
-    //     onChange={(e) => setEmail(e.target.value)} 
-    //   />
-    //   <input 
-    //     type="password" 
-    //     placeholder="Password" 
-    //     value={password} 
-    //     onChange={(e) => setPassword(e.target.value)} 
-    //   />
-    //   <button onClick={handleLogin}>Login</button>
-    // </div>
     <div>
-      {formTrue ? (
+      {sessionLocal ? (
+
+        <div>
+          <LoginFormRes login={sessionLocal.username} email={email} user_id={sessionLocal.user_id} token={sessionLocal.token} />
+          <button
+            type="submit"
+            onClick={handleLogout}
+            className="group relative w-full flex justify-center
+                py-2 px-4 border border-transparent text-sm font-medium
+                rounded-md text-white bg-indigo-600 hover:bg-indigo-700
+                focus:outline-none focus:ring-2 focus:ring-offset-2
+                focus:ring-indigo-500"
+          >
+            Logout
+          </button>
+        </div>
+
+      ) : (
+
 
         <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-md w-full space-y-8">
@@ -97,7 +113,7 @@ const LoginForm: React.FC = () => {
                   // id="name"
                   name="login"
                   type="login"
-                  value={login}
+                  //value={login}
                   onChange={(e) => setLogin(e.target.value)}
                   autoComplete="name"
                   required
@@ -117,7 +133,7 @@ const LoginForm: React.FC = () => {
                   // id="email-address"
                   name="email"
                   type="email"
-                  value={email}
+                  //value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   autoComplete="email"
                   required
@@ -137,7 +153,7 @@ const LoginForm: React.FC = () => {
                   // id="password"
                   name="password"
                   type="password"
-                  value={password}
+                  //value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
                   required
@@ -193,9 +209,6 @@ const LoginForm: React.FC = () => {
         </div>
 
 
-
-      ) : (
-        <LoginFormRes login={login} email={email} user_id={user_id} token={token} />
       )}
 
     </div>
