@@ -31,6 +31,37 @@ http://localhost:3000/
 
 ```
 
+## Tailwind CSS
+
+npm install -D tailwindcss
+
+npx tailwindcss init
+
+`tailwind.config.js`
+
+```
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+`./src/index.css`
+
+```
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+yarn add @material-tailwind/react
+
+
 ## Vite (не работают типы)
 
 ```
