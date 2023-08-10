@@ -1,6 +1,7 @@
 // src/LoginForm.tsx
 import React, { useState } from 'react';
 import { Client, Session } from '@heroiclabs/nakama-js';
+import LoginFormRes from './LoginFormRes';
 // import {
 //   Card,
 //   Input,
@@ -12,9 +13,14 @@ import { Client, Session } from '@heroiclabs/nakama-js';
 import "tailwindcss/tailwind.css";
 
 const LoginForm: React.FC = () => {
-  const [login, setLogin] = useState<string>('');
+  const [formTrue, setFormTrue] = useState<boolean>(true);
+  const [login, setLogin] = useState<string | undefined>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [user_id, setUserId] = useState<string | undefined>('');
+  const [token, setToken] = useState<string | undefined>('');
+
+
 
   const handleLogin = async () => {
 
@@ -28,7 +34,12 @@ const LoginForm: React.FC = () => {
       let create = true
       const session: Session = await client.authenticateEmail(email, password, create, login);
       console.log('Logged in successfully:', session);
+
+      setLogin(session.username);
+      setUserId(session.user_id);
+      setToken(session.token);
       // Navigate to another component or save session as required. 
+      setFormTrue(false);
     } catch (error) {
       console.error('Login failed:', error);
     }
@@ -56,26 +67,26 @@ const LoginForm: React.FC = () => {
     //   />
     //   <button onClick={handleLogin}>Login</button>
     // </div>
-
-
     <div>
-      <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div>
-            <img
-              className="mx-auto h-12 w-auto"
-              src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-              alt="Workflow"
-            />
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
-            {/* <p className="mt-2 text-center text-sm text-gray-600">
+      {formTrue ? (
+
+        <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md w-full space-y-8">
+            <div>
+              <img
+                className="mx-auto h-12 w-auto"
+                src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
+                alt="Workflow"
+              />
+              <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+              {/* <p className="mt-2 text-center text-sm text-gray-600">
               Or{' '}
               <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
                 start your 14-day free trial
               </a>
             </p> */}
-          </div>
-          {/* <form className="mt-8 space-y-6"> */}
+            </div>
+            {/* <form className="mt-8 space-y-6"> */}
             <input type="hidden" name="remember" defaultValue="true" />
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
@@ -177,10 +188,15 @@ const LoginForm: React.FC = () => {
                 Sign in
               </button>
             </div>
-          {/* </form> */}
+            {/* </form> */}
+          </div>
         </div>
-      </div>
 
+
+
+      ) : (
+        <LoginFormRes login={login} email={email} user_id={user_id} token={token} />
+      )}
 
     </div>
   );
