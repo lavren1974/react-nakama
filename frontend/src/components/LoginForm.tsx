@@ -69,7 +69,7 @@ const LoginForm: React.FC = () => {
       {sessionLocal ? (
 
         <div>
-          <LoginFormRes login={sessionLocal.username} email={email} user_id={sessionLocal.user_id} token={sessionLocal.token} />
+          <LoginFormRes login={sessionLocal.username} user_id={sessionLocal.user_id} token={sessionLocal.token} />
           <button
             type="submit"
             onClick={handleLogout}
